@@ -1,9 +1,10 @@
 import pandas as pd
 import json
 
-file = 'demo.xlsx'
+inFile = 'demo.xlsx'
+outputFile = 'result.json'
 
-df = pd.read_excel(file, sheet_name=0)
+df = pd.read_excel(inFile, sheet_name=0)
 
 QUESTION_TYPES = ('choice', 'branch', 'fin')
 
@@ -19,31 +20,38 @@ def decideType(qID):
         limit = int(x.group(1))
     return ('choice', limit)
 
+def resolveChoice(s, qType):
+    data = {
+        'description': s,
+    }
+    return data
+
 def row2json(df):
     qID      = df[0]
     qDesc    = df[1]
+    qBase    = qID.split('.')[0]
     (qType,qLimit)    = decideType(qID)
     assert(qType in QUESTION_TYPES)
     choices  = []
     for col in df[2:]:
         if (pd.isna(col)):   break
-        choices.append(col)
+        choices.append(  resolveChoice(col, qType) )
     data = {
+        'Base':qBase,
         'ID':qID,
         'Desc':qDesc,
         'Type':qType,
-        'Answers':qLimit,
+        'Limit':qLimit,
+        'Choices':choices,
     }
-    json_data = json.dumps(data, ensure_ascii=False)
-    print(json_data)
-    return 1
+    print(data)
+    return data
 
-def writeJson(obj):
-    print("writing part stub")
-
-
+questions = []
 for row in range(df.shape[0]):
     obj = row2json(df.loc[row])
-    writeJson(obj)
+    questions.append(obj)
 
-#print(xl.sheet_names)
+with open(outputFile, 'w') as outfh:
+    json.dump(questions, outfh, ensure_ascii=False)
+
