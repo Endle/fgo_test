@@ -1,3 +1,6 @@
+# Base 指第几道题 1.branch 1+1 的 Base 都是1
+# 假定第一行的题目是问卷的起点
+#
 import pandas as pd
 import json
 import re
@@ -58,7 +61,8 @@ def resolveChoice(s, qType):
 def row2json(df):
     qID      = df[0]
     qDesc    = df[1]
-    qBase    = qID.split('.')[0]
+    qBase    = qID.split('.')[0].split('+')[0]
+
     (qType,qLimit)    = decideType(qID)
     assert(qType in QUESTION_TYPES)
     choices  = []
