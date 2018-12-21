@@ -13,10 +13,40 @@ function selectQuestion(Qs, qid){
 }
 
 function loadQuestion(Qs, cur, q) {
+    let qBaseStr = `<div id="description"><p>${q.Desc}</p></div>`;
+    let qEl = $(qBaseStr);
+    q.Choices.forEach( function(x){
+        let hs = `<input type="radio"
+                        class="choice"
+                        name="stub" value="${x.description}">
+            ${x.description}<br>`;
+        /*console.log(x);*/
+        qEl.append( $(hs) );
+    });
+    let submit = $('<input type="submit" value="Next">');
+    submit.click( function(e){
+        let checkedChoices = $('.choice:checked');
+        //apply change of scores
+        checkedChoices.each(function(i){
+            let _this = this.value;
+            let c = q.Choices.find(function(x){
+                /*console.log('loop choices');*/
+                /*console.log(x.description);console.log(_this);*/
+                return x.description===_this;});
+            console.log('find chosen item');
+            console.log(c);
+            for (var i=0; i<cur.D; ++i) {
+                cur.score[i] += c.affection[i];
+            }
+        });
+        console.log(cur.score);
+    });
+    qEl.append(submit);
 
     //useless
     var q2 = selectQuestion(Qs, q.ID);
     $('#question').html(JSON.stringify(q2));
+    $('#question').append(qEl);
     return 1;
 }
 
