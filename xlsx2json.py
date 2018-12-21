@@ -1,5 +1,6 @@
 import pandas as pd
 import json
+import re
 
 inFile = 'demo.xlsx'
 outputFile = 'result.json'
@@ -7,6 +8,7 @@ outputFile = 'result.json'
 df = pd.read_excel(inFile, sheet_name=0)
 
 QUESTION_TYPES = ('choice', 'branch', 'fin')
+DIMENSION      = 3
 
 def decideType(qID):
     if (qID.find('fin') != -1):
@@ -15,15 +17,42 @@ def decideType(qID):
         return ('branch',1)
     limit = 1
     if (qID.find('multi') != -1):
-        import re
         x = re.search('<(\d+)>', qID)
         limit = int(x.group(1))
     return ('choice', limit)
 
 def resolveChoice(s, qType):
+    try:
+        (desc, affects_unpack) = s.split('@')
+    except ValueError:
+        desc = s
+        affects_unpack = ''
+    affects_unpack = affects_unpack.replace(' ', '')
+
     data = {
-        'description': s,
+        'description': desc,
     }
+
+    if (qType == 'branch'):
+        x = re.search('\{.+\}', affects_unpack)
+        jumpto = x.group(0)
+        affects_unpack = affects_unpack.replace(jumpto, '')
+        jumpto =re.sub(r'[{}]', '', jumpto)
+        data['jumpto'] = jumpto
+
+    affection = []
+    for i in range(DIMENSION): affection.append(0) #UGLY!
+
+    for i, val in enumerate( affects_unpack.split('$') ):
+        try:
+            val = int(val)
+        except ValueError:
+            val = 0
+        affection[i] = int(val)
+        print(val)
+
+    data['affection'] = affection
+    #data['affection'] = affects_unpack
     return data
 
 def row2json(df):
@@ -43,8 +72,10 @@ def row2json(df):
         'Type':qType,
         'Limit':qLimit,
         'Choices':choices,
+        'Dimension':DIMENSION,
     }
     print(data)
+    print('===============')
     return data
 
 questions = []
