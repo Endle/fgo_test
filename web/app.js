@@ -12,8 +12,18 @@ function selectQuestion(Qs, qid){
     });
 }
 
+function loadNext(Qs, cur, q) {
+}
+
 function loadQuestion(Qs, cur, q) {
-    let qBaseStr = `<div id="description"><p>${q.Desc}</p></div>`;
+    let multiHint = '';
+    if (q.ID.match('multi')) {
+        multiHint = 'Multiple choices not supported yet!';
+    }
+    let qBaseStr = `<div id="description">
+                        <p>${q.Desc}</p>
+                        <div id="hint">${multiHint}</div>
+                    </div>`;
     let qEl = $(qBaseStr);
     q.Choices.forEach( function(x){
         let hs = `<input type="radio"
@@ -40,6 +50,7 @@ function loadQuestion(Qs, cur, q) {
             }
         });
         console.log(cur.score);
+        loadNext();
     });
     qEl.append(submit);
 
