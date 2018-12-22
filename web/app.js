@@ -39,10 +39,11 @@ function loadQuestion(Qs, cur, q) {
     let submit = $('<input type="submit" value="Next">');
     submit.click( function(e){
         let checkedChoices = $('.choice:checked');
+        let c;
         let applyScores = function() {
             checkedChoices.each(function(i){
                 let _this = this.value;
-                let c = q.Choices.find(function(x){
+                c = q.Choices.find(function(x){
                     /*console.log('loop choices');*/
                     /*console.log(x.description);console.log(_this);*/
                     return x.description===_this;});
@@ -60,6 +61,18 @@ function loadQuestion(Qs, cur, q) {
             }
             $('#hint').text('');
             applyScores();
+            let next;
+            if (q.Type === 'branch') {
+                console.log('jump to next question by branch');
+                console.log(c);
+                next = Qs.find(function(x){return x.ID==c.jumpto;});
+                console.log(next);
+            } else if (q.Type === 'choice') {
+                console.log('stub');
+            } else {
+                console.log(`Question Type ${q.Type} not supported yet`);
+            }
+            loadQuestion(Qs, cur, next);
         };
         loadNext();
         console.log(cur.score);
