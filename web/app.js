@@ -12,11 +12,14 @@ function selectQuestion(Qs, qid){
     });
 }
 
-function loadNext(Qs, cur, q) {
+function inRange(x, r) {
+    return r.begin <= x && x < r.end;
 }
+
 
 function loadQuestion(Qs, cur, q) {
     let multiHint = '';
+    let resultRange = {'begin':1, 'end':2}; //[begin,end)
     if (q.ID.match('multi')) {
         multiHint = 'Multiple choices not supported yet!';
     }
@@ -36,21 +39,30 @@ function loadQuestion(Qs, cur, q) {
     let submit = $('<input type="submit" value="Next">');
     submit.click( function(e){
         let checkedChoices = $('.choice:checked');
-        //apply change of scores
-        checkedChoices.each(function(i){
-            let _this = this.value;
-            let c = q.Choices.find(function(x){
-                /*console.log('loop choices');*/
-                /*console.log(x.description);console.log(_this);*/
-                return x.description===_this;});
-            console.log('find chosen item');
-            console.log(c);
-            for (var i=0; i<cur.D; ++i) {
-                cur.score[i] += c.affection[i];
+        let applyScores = function() {
+            checkedChoices.each(function(i){
+                let _this = this.value;
+                let c = q.Choices.find(function(x){
+                    /*console.log('loop choices');*/
+                    /*console.log(x.description);console.log(_this);*/
+                    return x.description===_this;});
+                console.log('find chosen item');
+                console.log(c);
+                for (var i=0; i<cur.D; ++i) {
+                    cur.score[i] += c.affection[i];
+                }
+            });
+        };
+        let loadNext = function() {
+            if (!inRange(checkedChoices.length, resultRange)) {
+                $('#hint').text('Checked number is wrong');
+                return;
             }
-        });
-        console.log(cur.score);
+            $('#hint').text('');
+            applyScores();
+        };
         loadNext();
+        console.log(cur.score);
     });
     qEl.append(submit);
 
