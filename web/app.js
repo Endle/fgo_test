@@ -19,7 +19,7 @@ function inRange(x, r) {
 
 function loadQuestion(Qs, cur, q) {
     if (q === undefined || q === null) {
-        $('#question').text('loadQuestion Error at begin');
+        $('#question').text('The survey is finished' + cur.score.toString());
     }
     let multiHint = '';
     let resultRange = {'begin':1, 'end':2}; //[begin,end)
