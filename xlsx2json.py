@@ -59,8 +59,8 @@ def resolveChoice(s, qType):
     return data
 
 def row2json(df):
-    qID      = df[0]
-    qDesc    = df[1]
+    qID      = str(df[0])
+    qDesc    = str(df[1])
     qBase    = qID.split('.')[0].split('+')[0]
 
     (qType,qLimit)    = decideType(qID)
