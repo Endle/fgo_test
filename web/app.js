@@ -18,6 +18,9 @@ function inRange(x, r) {
 
 
 function loadQuestion(Qs, cur, q) {
+    if (q === undefined || q === null) {
+        $('#question').text('loadQuestion Error at begin');
+    }
     let multiHint = '';
     let resultRange = {'begin':1, 'end':2}; //[begin,end)
     if (q.ID.match('multi')) {
@@ -41,7 +44,7 @@ function loadQuestion(Qs, cur, q) {
         let checkedChoices = $('.choice:checked');
         let c;
         let applyScores = function() {
-            checkedChoices.each(function(i){
+            checkedChoices.each(function(lo){
                 let _this = this.value;
                 c = q.Choices.find(function(x){
                     /*console.log('loop choices');*/
@@ -62,13 +65,14 @@ function loadQuestion(Qs, cur, q) {
             $('#hint').text('');
             applyScores();
             let next;
+            console.log('Current choice is: '); console.log(c);
             if (q.Type === 'branch') {
                 console.log('jump to next question by branch');
-                console.log(c);
                 next = Qs.find(function(x){return x.ID==c.jumpto;});
                 console.log(next);
             } else if (q.Type === 'choice') {
-                console.log('stub');
+                console.log('Trying to find next question');
+                next = Qs.find(function(x){return x.Base==parseInt(q.Base)+1;});
             } else {
                 console.log(`Question Type ${q.Type} not supported yet`);
             }
