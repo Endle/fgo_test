@@ -4,9 +4,15 @@
 import pandas as pd
 import json
 import re
+import sys
 
 inFile = 'demo.xlsx'
-outputFile = 'result.json'
+outputFile = 'web/result.json'
+
+if (len(sys.argv) > 1):
+    inFile = sys.argv[1]
+
+print('Processing: ' + inFile)
 
 df = pd.read_excel(inFile, sheet_name=0)
 
@@ -52,7 +58,7 @@ def resolveChoice(s, qType):
         except ValueError:
             val = 0
         affection[i] = int(val)
-        print(val)
+        #print(val)
 
     data['affection'] = affection
     #data['affection'] = affects_unpack
